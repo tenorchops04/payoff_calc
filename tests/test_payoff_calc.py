@@ -156,3 +156,29 @@ class TestPayoffCalc(unittest.TestCase):
         self.assertEqual(principal_paid, expected_principal_paid)
         self.assertEqual(amount_remaining, expected_amount_remaining)
 
+    def test_make_payment_zero_amount(self):
+        principal = 365.25
+        min_payment = 10.0
+        accrued_interest = 30.0
+        amount_paid = 0.0
+
+        loan = Loan(
+            principal = principal,
+            term = 12,
+            interest_rate = 1.0,
+            loan_payment = min_payment
+        )
+        loan.total_accrued_interest = accrued_interest
+
+        interest_paid, principal_paid, amount_remaining = loan.make_payment(amount = amount_paid)
+
+        expected_interest_paid = 0
+        expected_principal_paid = 0
+        expected_amount_remaining = 0
+
+        self.assertEqual(loan.total_accrued_interest, accrued_interest - expected_interest_paid)
+        self.assertEqual(loan.principal, principal-expected_principal_paid)
+        self.assertEqual(interest_paid, expected_interest_paid)
+        self.assertEqual(principal_paid, expected_principal_paid)
+        self.assertEqual(amount_remaining, expected_amount_remaining)
+
