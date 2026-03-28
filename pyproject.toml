@@ -100,3 +100,21 @@ calc = "payoff_calc:main"
 [tool.setuptools]
 # If there are data files included in your packages that need to be
 # installed, specify them here.
+
+[tool.coverage.run]
+source = ["src"]  # The folder you want to measure
+branch = true                   # Measure branch coverage (if/else paths)
+omit = [                        # Files/folders to exclude from measurement
+    "tests/*",
+    "**/__init__.py",
+]
+
+[tool.coverage.report]
+show_missing = true             # Always show which lines were missed
+fail_under = 80                 # Fail the build if coverage is below this %
+exclude_lines = [               # Skip specific code patterns
+    "pragma: no cover",
+    "def __repr__",
+    "if __name__ == .__main__.:",
+]
+
