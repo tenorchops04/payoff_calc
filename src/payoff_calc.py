@@ -21,11 +21,15 @@ class Loan:
         return interest_accrued
 
     def make_payment(self, amount):
+        if amount < 0:
+            raise ValueError("Amount to pay cannot be negative")
+
         # Payments are first applied to accrued interest
-        payment_to_interest = self.total_accrued_interest % amount
-        payment_to_principal = amount - payment_to_interest
+        payment_to_interest = min(amount, self.total_accrued_interest)
+        payment_to_principal = min(self.principal, amount - payment_to_interest)
+        amount_remaining = amount - payment_to_interest - payment_to_principal
 
         self.total_accrued_interest -= payment_to_interest
         self.principal -= payment_to_principal
 
-        return payment_to_interest, payment_to_principal
+        return payment_to_interest, payment_to_principal, amount_remaining
