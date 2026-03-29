@@ -11,6 +11,9 @@ class Loan:
         self.interest_rate = interest_rate
         self.loan_payment = loan_payment
         self.total_accrued_interest = 0
+        self.total_paid = 0
+        self.total_paid_principal = 0
+        self.total_paid_interest = 0
 
     def accrue_interest(self, days: int = 1):
         daily_interest_accrual = (self.principal * self.interest_rate) / 365.25
@@ -31,5 +34,9 @@ class Loan:
 
         self.total_accrued_interest -= payment_to_interest
         self.principal -= payment_to_principal
+
+        self.total_paid += amount
+        self.total_paid_interest += payment_to_interest
+        self.total_paid_principal += payment_to_principal
 
         return payment_to_interest, payment_to_principal, amount_remaining
