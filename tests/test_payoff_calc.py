@@ -1,5 +1,6 @@
 import unittest
 
+from uuid import uuid4
 from payoff_calc import Loan
 
 class TestPayoffCalc(unittest.TestCase):
@@ -11,7 +12,8 @@ class TestPayoffCalc(unittest.TestCase):
             principal = 365.25,
             term = 12,
             interest_rate = 1.0,
-            loan_payment = 10.0
+            loan_payment = 10.0,
+            borrower_id = str(uuid4())
         )
 
         interest_accrued = loan.accrue_interest()
@@ -24,7 +26,8 @@ class TestPayoffCalc(unittest.TestCase):
             principal = 365.25,
             term = 12,
             interest_rate = 1.0,
-            loan_payment = 10.0
+            loan_payment = 10.0,
+            borrower_id = str(uuid4())
         )
 
         interest_accrued = loan.accrue_interest(days = 5)
@@ -39,7 +42,8 @@ class TestPayoffCalc(unittest.TestCase):
             principal = 365.25,
             term = 12,
             interest_rate = 1.0,
-            loan_payment = 10.0
+            loan_payment = 10.0,
+            borrower_id = str(uuid4())
         )
 
         accrued_interest = loan.total_accrued_interest
@@ -69,7 +73,8 @@ class TestPayoffCalc(unittest.TestCase):
             principal = principal,
             term = 12,
             interest_rate = 1.0,
-            loan_payment = min_payment
+            loan_payment = min_payment,
+            borrower_id = str(uuid4())
         )
         accrued_interest = loan.total_accrued_interest
 
@@ -99,7 +104,8 @@ class TestPayoffCalc(unittest.TestCase):
             principal = principal,
             term = 12,
             interest_rate = 1.0,
-            loan_payment = min_payment
+            loan_payment = min_payment,
+            borrower_id = str(uuid4())
         )
         loan.total_accrued_interest = accrued_interest
 
@@ -129,7 +135,8 @@ class TestPayoffCalc(unittest.TestCase):
             principal = principal,
             term = 12,
             interest_rate = 1.0,
-            loan_payment = min_payment
+            loan_payment = min_payment,
+            borrower_id = str(uuid4())
         )
         loan.total_accrued_interest = accrued_interest
 
@@ -159,7 +166,8 @@ class TestPayoffCalc(unittest.TestCase):
             principal = principal,
             term = 12,
             interest_rate = 1.0,
-            loan_payment = min_payment
+            loan_payment = min_payment,
+            borrower_id = str(uuid4())
         )
         loan.total_accrued_interest = accrued_interest
 
@@ -176,7 +184,8 @@ class TestPayoffCalc(unittest.TestCase):
             principal = principal,
             term = 12,
             interest_rate = 1.0,
-            loan_payment = min_payment
+            loan_payment = min_payment,
+            borrower_id = str(uuid4())
         )
         loan.total_accrued_interest = accrued_interest
 
@@ -207,7 +216,8 @@ class TestPayoffCalc(unittest.TestCase):
             principal = principal,
             term = 12,
             interest_rate = 1.0,
-            loan_payment = min_payment
+            loan_payment = min_payment,
+            borrower_id = str(uuid4())
         )
         loan.total_accrued_interest = accrued_interest
 

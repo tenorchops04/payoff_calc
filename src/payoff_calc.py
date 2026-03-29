@@ -1,11 +1,19 @@
+from uuid import uuid4
+
 class Loan:
     def __init__(
         self,
         principal: float,
         term: float,
         interest_rate: float,
-        loan_payment: float
+        loan_payment: float,
+        borrower_id: str,
+        loan_name = "Default",
+        loan_id = str(uuid4())
     ):
+        self.borrower_id = borrower_id
+        self.loan_name = loan_name
+        self.loan_id = loan_id
         self.principal = principal
         self.term = term
         self.interest_rate = interest_rate
@@ -40,3 +48,4 @@ class Loan:
         self.total_paid_principal += payment_to_principal
 
         return payment_to_interest, payment_to_principal, amount_remaining
+
