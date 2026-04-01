@@ -1,7 +1,7 @@
 import unittest
 
 from uuid import uuid4
-from payoff_calc import Loan
+from payoff_calc import Loan, Schedule
 
 class TestPayoffCalc(unittest.TestCase):
     def setUp(self):
@@ -238,3 +238,38 @@ class TestPayoffCalc(unittest.TestCase):
         self.assertEqual(principal_paid, expected_principal_paid)
         self.assertEqual(amount_remaining, expected_amount_remaining)
 
+    def test_schedule(self):
+        principal = 10000
+        term = 36
+        interest_rate = 0.10
+        loan_payment = 100
+        due_date = "2026-02-01"
+        borrower_id = str(uuid4())
+
+        loan = Loan(
+            principal=principal,
+            term=term,
+            interest_rate=interest_rate,
+            loan_payment=loan_payment,
+            due_date=due_date,
+            borrower_id=borrower_id
+        )
+
+        start_date = "2026-01-01"
+        pay_amount = 100
+
+        schedule = Schedule(
+            loan=loan,
+            start_date=start_date
+        )
+
+        schedule.create_schedule(pay_amount=pay_amount)
+
+        expected_total_paid = pay_amount
+        self.assertEqual(loan.total_paid, expected_total_paid)
+
+        expected_total_paid_interest = (principal*interest_rate) / 365.25 * 31
+        self.assertAlmostEqual(loan.total_paid_interest, expected_total_paid_interest)
+
+        expected_total_paid_principal = pay_amount - expected_total_paid_interest
+        self.assertAlmostEqual(loan.total_paid_principal, expected_total_paid_principal)
