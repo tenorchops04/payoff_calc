@@ -275,7 +275,7 @@ class TestPayoffCalc(unittest.TestCase):
         self.assertAlmostEqual(loan.total_paid_principal, expected_total_paid_principal)
 
     def test_payoff_schedule(self):
-        principal = 1000
+        principal = 100
         term = 36
         interest_rate = 0.10
         loan_payment = 100
@@ -300,3 +300,5 @@ class TestPayoffCalc(unittest.TestCase):
         )
 
         schedule.payoff_schedule(pay_amount=100)
+
+

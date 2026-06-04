@@ -27,8 +27,8 @@ class Loan:
         self.total_paid = 0
         self.total_paid_principal = 0
         self.total_paid_interest = 0
-        self.total_owed = self.principal
         self.interest_accrued = 0
+        self.total_owed = self.principal + self.interest_accrued
 
     def accrue_interest(self, days: int = 1):
         daily_interest_accrual = (self.principal * self.interest_rate) / 365.25
@@ -39,10 +39,18 @@ class Loan:
 
         return interest_accrued
 
+    def capitalize_interest(self):
+        self.principal += self.interest_accrued
+
     def make_payment(self, amount):
         if amount < 0:
             raise ValueError("Amount to pay cannot be negative")
-
+        total_owed = self.principal + self.interest_accrued
+        print(
+            f"{'  Total owed:':<25}{total_owed:>10.2f}\n" +
+            f"{'  Principal owed:':<25}{self.principal:>10.2f}\n" +
+            f"{'  Interest accrued:':<25}{self.interest_accrued:>10.2f}"
+        )
         # Payments are first applied to accrued interest
         payment_to_interest = min(amount, self.interest_accrued)
         payment_to_principal = min(self.principal, amount - payment_to_interest)
@@ -50,7 +58,13 @@ class Loan:
 
         self.interest_accrued -= payment_to_interest
         self.principal -= payment_to_principal
-        self.total_owed = self.principal + self.interest_accrued
+        print(
+            f"{'  Amount paid:':<25}{amount:>10.2f}\n" +
+            f"{'  Principal paid:':<25}{payment_to_principal:>10.2f}\n" +
+            f"{'  Interest paid:':<25}{payment_to_interest:>10.2f}\n" +
+            f"{'  Interest remaining:':<25}{self.interest_accrued:>10.2f}\n" +
+            f"{'  Principal remaining:':<25}{self.principal:>10.2f}"
+        )
 
         self.total_paid += amount - amount_remaining
         self.total_paid_interest += payment_to_interest
@@ -64,25 +78,24 @@ class Schedule:
         self.start_date = start_date
 
     def generate_month(self, pay_amount: float, curr_date: datetime):
-        interest_accrued = self.loan.interest_accrued
 
         while curr_date <= self.loan.due_date:
             if curr_date == self.loan.due_date:
-                interest_payment, principal_payment, _ = self.loan.make_payment(pay_amount)
+                total_owed = self.loan.principal+self.loan.interest_accrued
+                pay_amount = min(pay_amount, total_owed)
                 print(
-                    f"Payment date: {curr_date:%m-%d-%Y}\n" +
-                    f"{'  Amount paid:':<25}{pay_amount:>10.2f}\n" +
-                    f"{'  Interest accrued:':<25}{interest_accrued:>10.2f}\n" +
-                    f"{'  Interest paid:':<25}{interest_payment:>10.2f}\n" +
-                    f"{'  Principal paid:':<25}{principal_payment:>10.2f}\n" +
-                    f"{'  Amount owed:':<25}{self.loan.principal + self.loan.interest_accrued:>10.2f}\n" +
+                    f"Payment date: {curr_date:%m-%d-%Y}"
+                )
+                interest_payment, principal_payment, _ = self.loan.make_payment(pay_amount)
+                total_owed = self.loan.principal+self.loan.interest_accrued
+                print(
+                    f"{'  Remaining balance:':<25}{total_owed:>10.2f}\n" +
                     f"{'  Total amount paid:':<25}{self.loan.total_paid:>10.2f}\n" +
                     f"{'  Total principal paid:':<25}{self.loan.total_paid_principal:>10.2f}\n" +
-                    f"{'  Total interest paid:':<25}{self.loan.total_paid_interest:>10.2f}"
+                    f"{'  Total interest paid:':<25}{self.loan.total_paid_interest:>10.2f}\n"
                 )
-                interest_accrued = self.loan.interest_accrued
             else:
-                interest_accrued += self.loan.accrue_interest()
+                self.loan.accrue_interest()
             curr_date = curr_date + timedelta(days=1)
 
         self.loan.due_date += relativedelta(months=1)
@@ -91,6 +104,8 @@ class Schedule:
 
     def payoff_schedule(self, pay_amount: float):
         curr_date = datetime.fromisoformat(self.start_date)
-        while not isclose(self.loan.total_owed, 0, abs_tol=1e-2):
-            payment = min(pay_amount, self.loan.total_owed)
-            curr_date = self.generate_month(payment, curr_date)
+        total_owed = self.loan.principal+self.loan.interest_accrued
+        while not isclose(total_owed, 0, abs_tol=1e-2):
+            # payment = min(pay_amount, self.loan.total_owed)
+            curr_date = self.generate_month(pay_amount, curr_date)
+            total_owed = self.loan.principal+self.loan.interest_accrued
