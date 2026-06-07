@@ -275,11 +275,11 @@ class TestPayoffCalc(unittest.TestCase):
         self.assertAlmostEqual(loan.total_paid_principal, expected_total_paid_principal)
 
     def test_payoff_schedule(self):
-        principal = 100
+        principal = 9606.71
         term = 36
-        interest_rate = 0.10
+        interest_rate = 0.0503
         loan_payment = 100
-        due_date = "2026-02-01"
+        due_date = "2026-06-05"
         borrower_id = str(uuid4())
 
         loan = Loan(
@@ -291,14 +291,14 @@ class TestPayoffCalc(unittest.TestCase):
             borrower_id=borrower_id
         )
 
-        start_date = "2026-01-01"
-        pay_amount = 100
+        start_date = "2026-05-06"
+        pay_amount = 1205.40
 
         schedule = Schedule(
             loan=loan,
             start_date=start_date
         )
 
-        schedule.payoff_schedule(pay_amount=100)
+        schedule.payoff_schedule(pay_amount=pay_amount)
 
 
