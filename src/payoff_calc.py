@@ -76,6 +76,7 @@ class Schedule:
     def __init__(self, loan: Loan, start_date: str):
         self.loan = loan
         self.start_date = start_date
+        self.payoff_date = None
 
     def generate_month(self, pay_amount: float, curr_date: datetime):
 
@@ -109,7 +110,7 @@ class Schedule:
             # payment = min(pay_amount, self.loan.total_owed)
             curr_date = self.generate_month(pay_amount, curr_date)
             total_owed = self.loan.principal+self.loan.interest_accrued
-
+        self.payoff_date = curr_date
         print(f"Pay off date: {curr_date}")
         print(f"{'Total principal paid:':<25}{self.loan.total_paid_principal:>10.2f}")
         print(f"{'Total interest paid:':<25}{self.loan.total_paid_interest:>10.2f}")
