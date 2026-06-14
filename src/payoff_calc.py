@@ -1,3 +1,4 @@
+from typing import NamedTuple
 from uuid import uuid4
 from math import isclose
 from datetime import datetime, timedelta
@@ -72,11 +73,17 @@ class Loan:
 
         return payment_to_interest, payment_to_principal, amount_remaining
 
+class Statement(NamedTuple):
+    date: str
+    principal: float
+    interest: float
+
 class Schedule:
     def __init__(self, loan: Loan, start_date: str):
         self.loan = loan
         self.start_date = start_date
         self.payoff_date = None
+        self.schedule = []
 
     def generate_month(self, pay_amount: float, curr_date: datetime):
 
@@ -84,17 +91,14 @@ class Schedule:
             if curr_date == self.loan.due_date:
                 total_owed = self.loan.principal+self.loan.interest_accrued
                 pay_amount = min(pay_amount, total_owed)
-                #print(
-                #    f"Payment date: {curr_date:%m-%d-%Y}"
-                #)
                 interest_payment, principal_payment, _ = self.loan.make_payment(pay_amount)
                 total_owed = self.loan.principal+self.loan.interest_accrued
-                #print(
-                #    f"{'  Remaining balance:':<25}{total_owed:>10.2f}\n" +
-                #    f"{'  Total amount paid:':<25}{self.loan.total_paid:>10.2f}\n" +
-                #    f"{'  Total principal paid:':<25}{self.loan.total_paid_principal:>10.2f}\n" +
-                #    f"{'  Total interest paid:':<25}{self.loan.total_paid_interest:>10.2f}\n"
-                #)
+                month_statement = Statement(
+                    date = curr_date.strftime("%m-%d-%Y"),
+                    principal = principal_payment,
+                    interest = interest_payment
+                )
+                self.schedule.append(month_statement)
             else:
                 self.loan.accrue_interest()
             curr_date = curr_date + timedelta(days=1)
@@ -107,7 +111,6 @@ class Schedule:
         curr_date = datetime.fromisoformat(self.start_date)
         total_owed = self.loan.principal+self.loan.interest_accrued
         while not isclose(total_owed, 0, abs_tol=1e-2):
-            # payment = min(pay_amount, self.loan.total_owed)
             curr_date = self.generate_month(pay_amount, curr_date)
             total_owed = self.loan.principal+self.loan.interest_accrued
         self.payoff_date = curr_date

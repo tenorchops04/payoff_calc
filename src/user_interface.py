@@ -10,11 +10,14 @@ from PySide6.QtWidgets import(
     QLineEdit,
     QPushButton,
     QDateEdit,
-    QLabel
+    QLabel,
+    QTableWidget,
+    QTableWidgetItem
 )
 from payoff_calc import (
     Schedule,
-    Loan
+    Loan,
+    Statement
 )
 
 class LoanCalculatorApp(QMainWindow):
@@ -41,6 +44,8 @@ class LoanCalculatorApp(QMainWindow):
         self.start_date = self.date_edit.date().toString("yyyy-MM-dd")
         self.calculate_btn.clicked.connect(self.run_calculation)
 
+        self.schedule_table = QTableWidget()
+
         input_layout.addWidget(self.amount_input)
         input_layout.addWidget(self.rate_input)
         input_layout.addWidget(self.payment_input)
@@ -57,6 +62,7 @@ class LoanCalculatorApp(QMainWindow):
         output_layout.addWidget(self.total_paid_label)
         output_layout.addWidget(self.total_principal_paid_label)
         output_layout.addWidget(self.total_interest_paid_label)
+        output_layout.addWidget(self.schedule_table)
 
         main_layout.addLayout(input_layout)
         main_layout.addLayout(output_layout)
@@ -80,6 +86,21 @@ class LoanCalculatorApp(QMainWindow):
         )
 
         schedule.payoff_schedule(float(self.payment_input.text()))
+
+        self.schedule_table.setColumnCount(len(Statement._fields))
+        self.schedule_table.setHorizontalHeaderLabels(["Date", "Principal", "Interest"])
+        self.schedule_table.setRowCount(len(schedule.schedule))
+
+        for i, statement in enumerate(schedule.schedule):
+            print(statement.date)
+            print(statement.principal)
+            print(statement.interest)
+            item_date = QTableWidgetItem(statement.date)
+            item_principal = QTableWidgetItem(f"{statement.principal:.2f}")
+            item_interest = QTableWidgetItem(f"{statement.interest:.2f}")
+            self.schedule_table.setItem(i, 0, item_date)
+            self.schedule_table.setItem(i, 1, item_principal)
+            self.schedule_table.setItem(i, 2, item_interest)
 
         self.date_paid_label.setText(
             f"Estimated payoff date: {schedule.payoff_date}"
