@@ -41,7 +41,12 @@ class LoanCalculatorApp(QMainWindow):
         self.date_edit.setDate(QDate.currentDate())
         self.date_edit.setCalendarPopup(True)
         self.date_edit.setDisplayFormat("MM-dd-yyyy")
-        self.start_date = self.date_edit.date().toString("yyyy-MM-dd")
+
+        self.due_date_edit = QDateEdit()
+        self.due_date_edit.setDate(QDate.currentDate())
+        self.due_date_edit.setCalendarPopup(True)
+        self.due_date_edit.setDisplayFormat("MM-dd-yyyy")
+
         self.calculate_btn.clicked.connect(self.run_calculation)
 
         self.schedule_table = QTableWidget()
@@ -51,6 +56,7 @@ class LoanCalculatorApp(QMainWindow):
         input_layout.addWidget(self.payment_input)
         input_layout.addWidget(self.term_input)
         input_layout.addWidget(self.date_edit)
+        input_layout.addWidget(self.due_date_edit)
         input_layout.addWidget(self.calculate_btn)
 
         self.date_paid_label = QLabel("Estimated payoff date: ")
@@ -72,12 +78,15 @@ class LoanCalculatorApp(QMainWindow):
         self.setCentralWidget(container)
 
     def run_calculation(self):
+        self.start_date = self.date_edit.date().toString("yyyy-MM-dd")
+        self.due_date = self.due_date_edit.date().toString("yyyy-MM-dd")
+
         loan = Loan(
             principal = float(self.amount_input.text().strip()),
             term = int(self.term_input.text().strip()),
             interest_rate = float(self.rate_input.text())/100,
             loan_payment = float(self.payment_input.text()),
-            due_date = self.start_date,
+            due_date = self.due_date,
             borrower_id = "test"
         )
         schedule = Schedule(
