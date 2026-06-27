@@ -1,4 +1,5 @@
 import unittest
+from datetime import datetime
 
 from uuid import uuid4
 from payoff_calc import Loan, Schedule
@@ -13,7 +14,8 @@ class TestPayoffCalc(unittest.TestCase):
             term = 12,
             interest_rate = 1.0,
             loan_payment = 10.0,
-            borrower_id = str(uuid4())
+            borrower_id = str(uuid4()),
+            due_date = "2026-01-01"
         )
 
         interest_accrued = loan.accrue_interest()
@@ -27,7 +29,8 @@ class TestPayoffCalc(unittest.TestCase):
             term = 12,
             interest_rate = 1.0,
             loan_payment = 10.0,
-            borrower_id = str(uuid4())
+            borrower_id = str(uuid4()),
+            due_date = "2026-01-01"
         )
 
         interest_accrued = loan.accrue_interest(days = 5)
@@ -43,7 +46,8 @@ class TestPayoffCalc(unittest.TestCase):
             term = 12,
             interest_rate = 1.0,
             loan_payment = 10.0,
-            borrower_id = str(uuid4())
+            borrower_id = str(uuid4()),
+            due_date = "2026-01-01"
         )
 
         accrued_interest = loan.total_accrued_interest
@@ -74,7 +78,8 @@ class TestPayoffCalc(unittest.TestCase):
             term = 12,
             interest_rate = 1.0,
             loan_payment = min_payment,
-            borrower_id = str(uuid4())
+            borrower_id = str(uuid4()),
+            due_date = "2026-01-01"
         )
         accrued_interest = loan.total_accrued_interest
 
@@ -105,8 +110,10 @@ class TestPayoffCalc(unittest.TestCase):
             term = 12,
             interest_rate = 1.0,
             loan_payment = min_payment,
-            borrower_id = str(uuid4())
+            borrower_id = str(uuid4()),
+            due_date = "2026-01-01"
         )
+        loan.interest_accrued = accrued_interest
         loan.total_accrued_interest = accrued_interest
 
         interest_paid, principal_paid, amount_remaining = loan.make_payment(amount = min_payment)
@@ -114,7 +121,8 @@ class TestPayoffCalc(unittest.TestCase):
         expected_interest_paid = amount_paid
         expected_principal_paid = amount_paid - expected_interest_paid
 
-        self.assertEqual(loan.total_accrued_interest, accrued_interest-min_payment)
+        self.assertEqual(loan.interest_accrued, accrued_interest-min_payment)
+        self.assertEqual(loan.total_accrued_interest, accrued_interest)
         self.assertEqual(loan.principal, principal)
 
         self.assertEqual(loan.total_paid, amount_paid)
@@ -136,16 +144,19 @@ class TestPayoffCalc(unittest.TestCase):
             term = 12,
             interest_rate = 1.0,
             loan_payment = min_payment,
-            borrower_id = str(uuid4())
+            borrower_id = str(uuid4()),
+            due_date = "2026-01-01"
         )
         loan.total_accrued_interest = accrued_interest
+        loan.interest_accrued = accrued_interest
 
-        interest_paid, principal_paid, amount_remaining = loan.make_payment(amount = amount_paid)
+        interest_paid, principal_paid, amount_remaining = loan.make_payment(amount=amount_paid)
 
         expected_interest_paid = accrued_interest
         expected_principal_paid = amount_paid-accrued_interest
 
-        self.assertEqual(loan.total_accrued_interest, accrued_interest - expected_interest_paid)
+        self.assertEqual(loan.interest_accrued, accrued_interest - expected_interest_paid)
+        self.assertEqual(loan.total_accrued_interest, accrued_interest)
         self.assertEqual(loan.principal, principal-expected_principal_paid)
 
         self.assertEqual(loan.total_paid, amount_paid)
@@ -167,7 +178,8 @@ class TestPayoffCalc(unittest.TestCase):
             term = 12,
             interest_rate = 1.0,
             loan_payment = min_payment,
-            borrower_id = str(uuid4())
+            borrower_id = str(uuid4()),
+            due_date = "2026-01-01"
         )
         loan.total_accrued_interest = accrued_interest
 
@@ -185,9 +197,11 @@ class TestPayoffCalc(unittest.TestCase):
             term = 12,
             interest_rate = 1.0,
             loan_payment = min_payment,
-            borrower_id = str(uuid4())
+            borrower_id = str(uuid4()),
+            due_date = "2026-01-01"
         )
         loan.total_accrued_interest = accrued_interest
+        loan.interest_accrued = accrued_interest
 
         interest_paid, principal_paid, amount_remaining = loan.make_payment(amount = amount_paid)
 
@@ -195,10 +209,11 @@ class TestPayoffCalc(unittest.TestCase):
         expected_principal_paid = principal
         expected_amount_remaining = amount_paid - (principal + accrued_interest)
 
-        self.assertEqual(loan.total_accrued_interest, accrued_interest - expected_interest_paid)
+        self.assertEqual(loan.interest_accrued, accrued_interest - expected_interest_paid)
+        self.assertEqual(loan.total_accrued_interest, accrued_interest)
         self.assertEqual(loan.principal, principal-expected_principal_paid)
 
-        self.assertEqual(loan.total_paid, amount_paid)
+        self.assertEqual(loan.total_paid, principal + accrued_interest)
         self.assertEqual(loan.total_paid_interest, expected_interest_paid)
         self.assertEqual(loan.total_paid_principal, expected_principal_paid)
 
@@ -217,7 +232,8 @@ class TestPayoffCalc(unittest.TestCase):
             term = 12,
             interest_rate = 1.0,
             loan_payment = min_payment,
-            borrower_id = str(uuid4())
+            borrower_id = str(uuid4()),
+            due_date = "2026-01-01"
         )
         loan.total_accrued_interest = accrued_interest
 
@@ -256,6 +272,7 @@ class TestPayoffCalc(unittest.TestCase):
         )
 
         start_date = "2026-01-01"
+        curr_date = datetime.fromisoformat(start_date)
         pay_amount = 100
 
         schedule = Schedule(
@@ -263,7 +280,7 @@ class TestPayoffCalc(unittest.TestCase):
             start_date=start_date
         )
 
-        schedule.generate_month(pay_amount=pay_amount)
+        schedule.generate_month(pay_amount=pay_amount, curr_date=curr_date)
 
         expected_total_paid = pay_amount
         self.assertEqual(loan.total_paid, expected_total_paid)
